@@ -8,24 +8,36 @@ import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.view.ViewHelper;
 
 public abstract class IndicatorBaseAnimator {
+    //动画的时间长度
     protected long duration = 200;
+    //动画的集合
     protected AnimatorSet animatorSet = new AnimatorSet();
+    //动画的速度控制器
     private Interpolator interpolator;
+    //延迟
     private long delay;
+    //动画的观察者
     private AnimatorListener listener;
 
+    //给指定的View设置动画
     public abstract void setAnimation(View view);
 
+    //指定的View启动动画
     protected void start(final View view) {
+        //动画进行重置
         reset(view);
+        //给指定的View设置动画
         setAnimation(view);
 
+        //动画集合设置动画的时间的长度
         animatorSet.setDuration(duration);
         if (interpolator != null) {
+            //动画集合设置速度控制器
             animatorSet.setInterpolator(interpolator);
         }
 
         if (delay > 0) {
+            //设置动画的延迟的时间
             animatorSet.setStartDelay(delay);
         }
 
@@ -33,11 +45,13 @@ public abstract class IndicatorBaseAnimator {
             animatorSet.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
+                    //回调开始
                     listener.onAnimationStart(animator);
                 }
 
                 @Override
                 public void onAnimationRepeat(Animator animator) {
+                    //回调重复
                     listener.onAnimationRepeat(animator);
                 }
 
@@ -48,6 +62,7 @@ public abstract class IndicatorBaseAnimator {
 
                 @Override
                 public void onAnimationCancel(Animator animator) {
+                    //回调取消
                     listener.onAnimationCancel(animator);
                 }
             });
@@ -57,6 +72,7 @@ public abstract class IndicatorBaseAnimator {
         animatorSet.start();
     }
 
+    //透明度  缩放 平移 旋转
     public static void reset(View view) {
         ViewHelper.setAlpha(view, 1);
         ViewHelper.setScaleX(view, 1);
@@ -68,6 +84,7 @@ public abstract class IndicatorBaseAnimator {
         ViewHelper.setRotationX(view, 0);
     }
 
+    //设置延迟以及持续的时间后  返回对象
     public IndicatorBaseAnimator duration(long duration) {
         this.duration = duration;
         return this;
@@ -88,10 +105,12 @@ public abstract class IndicatorBaseAnimator {
         return this;
     }
 
+    //启动动画
     public void playOn(View view) {
         start(view);
     }
 
+    //自定义的动画的回调
     public interface AnimatorListener {
         void onAnimationStart(Animator animator);
 

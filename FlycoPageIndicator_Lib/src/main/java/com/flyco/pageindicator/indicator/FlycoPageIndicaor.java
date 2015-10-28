@@ -19,30 +19,41 @@ import android.widget.RelativeLayout;
 import com.flyco.pageindicator.R;
 import com.flyco.pageindicator.anim.base.IndicatorBaseAnimator;
 import com.flyco.pageindicator.indicator.base.PageIndicator;
+import com.flyco.pageindicator.indicator.base.PageIndicatorEnum;
 import com.nineoldandroids.view.ViewHelper;
 
 import java.util.ArrayList;
-
+//首先这是一个LinearLayout的布局
 public class FlycoPageIndicaor extends LinearLayout implements PageIndicator {
     private Context context;
     private ViewPager vp;
     private RelativeLayout rl_parent;
     private View selectView;
+    //封装的是View  这个地方的扩展性也需要进行修改
+    //使得指示标不仅仅是支持ImageView
     private ArrayList<ImageView> indicatorViews = new ArrayList<>();
     private int count;
 
     private int currentItem;
     private int lastItem;
+    //指示标的宽度 高度 以及  间距
     private int indicatorWidth;
     private int indicatorHeight;
     private int indicatorGap;
+    //圆角半径
     private int cornerRadius;
+    //选中与未选中的图片
     private Drawable selectDrawable;
     private Drawable unSelectDrawable;
+    //画笔的宽度
     private int strokeWidth;
+    //画笔的颜色
     private int strokeColor;
     private boolean isSnap;
 
+    //动画分别分成两类
+    //选中的动画
+    //未选中的动画
     private Class<? extends IndicatorBaseAnimator> selectAnimClass;
     private Class<? extends IndicatorBaseAnimator> unselectAnimClass;
 
@@ -56,13 +67,17 @@ public class FlycoPageIndicaor extends LinearLayout implements PageIndicator {
         setClipChildren(false);
         setClipToPadding(false);
 
+        //创建一个相对布局
         rl_parent = new RelativeLayout(context);
         rl_parent.setClipChildren(false);
         rl_parent.setClipToPadding(false);
         addView(rl_parent);
 
+        //设置Gravity为剧中
         setGravity(Gravity.CENTER);
+        //创建一个TypedArray的对象
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.FlycoPageIndicaor);
+        //得到相关的属性的配置的数值
         indicatorWidth = ta.getDimensionPixelSize(R.styleable.FlycoPageIndicaor_fpi_width, dp2px(6));
         indicatorHeight = ta.getDimensionPixelSize(R.styleable.FlycoPageIndicaor_fpi_height, dp2px(6));
         indicatorGap = ta.getDimensionPixelSize(R.styleable.FlycoPageIndicaor_fpi_gap, dp2px(8));
@@ -71,6 +86,7 @@ public class FlycoPageIndicaor extends LinearLayout implements PageIndicator {
         strokeColor = ta.getColor(R.styleable.FlycoPageIndicaor_fpi_strokeColor, Color.parseColor("#ffffff"));
         isSnap = ta.getBoolean(R.styleable.FlycoPageIndicaor_fpi_isSnap, false);
 
+        //得到相关的颜色与选中的图片的资源
         int selectColor = ta.getColor(R.styleable.FlycoPageIndicaor_fpi_selectColor, Color.parseColor("#ffffff"));
         int unselectColor = ta.getColor(R.styleable.FlycoPageIndicaor_fpi_unselectColor, Color.parseColor("#88ffffff"));
         int selectRes = ta.getResourceId(R.styleable.FlycoPageIndicaor_fpi_selectRes, 0);
@@ -80,12 +96,14 @@ public class FlycoPageIndicaor extends LinearLayout implements PageIndicator {
         if (selectRes != 0) {
             this.selectDrawable = getResources().getDrawable(selectRes);
         } else {
+            //如果是0 手动的创建
             this.selectDrawable = getDrawable(selectColor, cornerRadius);
         }
 
         if (unselectRes != 0) {
             this.unSelectDrawable = getResources().getDrawable(unselectRes);
         } else {
+            //如果是0 手动的创建
             this.unSelectDrawable = getDrawable(unselectColor, cornerRadius);
         }
     }
@@ -190,26 +208,15 @@ public class FlycoPageIndicaor extends LinearLayout implements PageIndicator {
         }
     }
 
+    //在原有的ViewPager上面进行修改
     @Override
-    public void setViewPager(ViewPager vp) {
+    public void setViewPager(ViewPager vp, int realCount, PageIndicatorEnum pageIndicatorEnum) {
         this.vp = vp;
         if (isValid()) {
-            this.count = vp.getAdapter().getCount();
+            this.count = pageIndicatorEnum.getViewPagerCounter(vp, realCount);
             vp.removeOnPageChangeListener(this);
             vp.addOnPageChangeListener(this);
-
-            createIndicators();
-        }
-    }
-
-    @Override
-    public void setViewPager(ViewPager vp, int realCount) {
-        this.vp = vp;
-        if (isValid()) {
-            this.count = realCount;
-            vp.removeOnPageChangeListener(this);
-            vp.addOnPageChangeListener(this);
-
+            //创建指示器的布局
             createIndicators();
         }
     }
@@ -284,6 +291,7 @@ public class FlycoPageIndicaor extends LinearLayout implements PageIndicator {
         rl_parent.addView(ll_unselect_views);
 
         for (int i = 0; i < count; i++) {
+            //创建单个ImageView的对象
             ImageView iv = new ImageView(context);
             iv.setImageDrawable(!isSnap ? unSelectDrawable : (currentItem == i ? selectDrawable : unSelectDrawable));
             LayoutParams lp = new LayoutParams(indicatorWidth,
@@ -325,6 +333,7 @@ public class FlycoPageIndicaor extends LinearLayout implements PageIndicator {
     }
 
     private GradientDrawable getDrawable(int color, float raduis) {
+        //画笔以及相应的颜色
         GradientDrawable drawable = new GradientDrawable();
         drawable.setCornerRadius(raduis);
         drawable.setStroke(strokeWidth, strokeColor);

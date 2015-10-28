@@ -12,6 +12,7 @@ public class NoAnimExist extends IndicatorBaseAnimator {
     }
 
     public void setAnimation(View view) {
+        //对应的透明度进行还原
         this.animatorSet.playTogether(new Animator[]{
                 ObjectAnimator.ofFloat(view, "alpha", 1, 1)});
     }

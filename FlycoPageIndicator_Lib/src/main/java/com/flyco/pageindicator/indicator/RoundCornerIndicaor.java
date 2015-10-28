@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.flyco.pageindicator.R;
 import com.flyco.pageindicator.indicator.base.PageIndicator;
+import com.flyco.pageindicator.indicator.base.PageIndicatorEnum;
 
 import java.util.ArrayList;
 
@@ -66,29 +67,10 @@ public class RoundCornerIndicaor extends View implements PageIndicator {
     }
 
     @Override
-    public void setViewPager(ViewPager vp) {
+    public void setViewPager(ViewPager vp, int realCount, PageIndicatorEnum pageIndicatorEnum) {
         if (isValid(vp)) {
             this.vp = vp;
-            this.count = vp.getAdapter().getCount();
-            vp.removeOnPageChangeListener(this);
-            vp.addOnPageChangeListener(this);
-
-            unselectDrawables.clear();
-            unselectRects.clear();
-            for (int i = 0; i < count; i++) {
-                unselectDrawables.add(new GradientDrawable());
-                unselectRects.add(new Rect());
-            }
-
-            invalidate();
-        }
-    }
-
-    @Override
-    public void setViewPager(ViewPager vp, int realCount) {
-        if (isValid(vp)) {
-            this.vp = vp;
-            this.count = realCount;
+            this.count = pageIndicatorEnum.getViewPagerCounter(vp, realCount);
             vp.removeOnPageChangeListener(this);
             vp.addOnPageChangeListener(this);
 
